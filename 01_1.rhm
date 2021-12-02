@@ -1,0 +1,49 @@
+#lang rhombus
+
+import:
+  open:
+    rhombus/macro
+    rhombus/compat/extra:
+      only:
+        |>
+    rhombus/compat/stream:
+      only:
+        Stream
+  rhombus/compat/stream
+  #{advent-of-code} as aoc:
+    rename:
+      #{find-session}   as find_session
+      #{open-aoc-input} as open_input
+  racket/base as r:
+    rename:
+      #{in-port}          as in_port
+      #{sequence->stream} as sequence_to_stream
+      #{null?}            as is_null
+
+// Support for multiple stream argument stream-map which is not in the Racket
+// stream library.
+fun any_empty(ss):
+  r.ormap(fun (s -: Stream): s.is_empty, ss)
+
+fun stream_map(f, ss, ...) -: Stream:
+  cond
+  | any_empty(ss): stream.empty
+  | ~else:
+      val firsts: r.map(fun(x -: Stream): x.first, ss)
+      val rests: r.map(fun(x -: Stream): x.rest, ss)
+      stream.cons(r.apply(f, firsts),
+                  r.apply(stream_map, f, rests))
+
+fun in_port_read(p):
+  r.in_port(r.read, p)
+
+fun day_one_input():
+  aoc.open_input(aoc.find_session(), 2021, 1, ~cache: #true)
+
+val input_stream :: Stream:
+  day_one_input()
+    |> in_port_read
+    |> r.sequence_to_stream
+
+stream_map(fun(a,b): a < b, input_stream, input_stream.rest)
+  .count(fun(x): x)
