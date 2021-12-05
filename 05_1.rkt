@@ -43,8 +43,8 @@ DATA
   (in-generator
    (for ([c range]) (yield (make-posn c)))))   
 
-(define (lines->map a-line-list)
-  (for*/fold ([m (hash)]) ([a-line (in-list a-line-list)]
+(define (lines->map a-line-seq)
+  (for*/fold ([m (hash)]) ([a-line a-line-seq]
                            [a-posn (in-line-points a-line)])
     (hash-update m a-posn add1 0)))
 
@@ -69,7 +69,6 @@ DATA
     (open-aoc-input (find-session) 2021 5 #:cache #t)
     (in-port read-input-line _)
     (sequence-filter line-axis-aligned? _)
-    sequence->list
     lines->map
     in-hash-values
     (sequence-filter (lambda~> (> 1)) _)
