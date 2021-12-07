@@ -1,0 +1,65 @@
+#lang rhombus
+
+// Rhombus port of Brian Adkins solution
+// <https://github.com/lojic/LearningRacket/blob/master/advent-of-code-2021/solutions/day06/day06.rkt>
+
+import:
+  #{advent-of-code} as aoc:
+    rename:
+      #{open-aoc-input} as puzzle_input
+      #{find-session} as find_session
+  racket/base:
+    rename:
+      #{zero?}          as is_zero
+      #{make-vector}    as make_vector
+      #{string->number} as string_to_number
+      #{vector-length}  as vector_length
+  racket/port:
+    rename:
+      #{port->string} as to_string
+  racket/string:
+    rename:
+      #{string-split} as split
+      #{string-trim}  as trim
+  rhombus/compat/extra open
+
+fun vector_update(vec, i, f):
+  vec[i] := f(vec[i])
+
+
+fun iterate(f, seed, count):
+  if base.is_zero(count)
+  | seed
+  | iterate(f, f(seed), count - 1)
+
+
+fun vector_sum(vec):
+  fun step(i, sum):
+    if base.is_zero(i)
+    | sum + vec[i]
+    | step(i - 1, sum + vec[i])
+  step(base.vector_length(vec) - 1, 0)      
+
+
+// `|>` operator is (currently) not as fancy as the threading macro, which is
+// why there is some explicit grouping and literal funs.
+val fish:
+  aoc.puzzle_input(aoc.find_session(), 2021, 6, ~cache: #true)
+    |> port.to_string
+    |> string.trim  
+    |> (fun(s): string.split(s, ","))
+    |> (fun(ss): base.map(base.string_to_number, ss))
+    |> (fun(ns):
+          base.foldl(fun(n, vec): vector_update(vec, n, base.add1); vec,
+                     base.make_vector(9, 0),
+                     ns))
+
+
+fun solve(fish, n):
+  fun spawn(fish):
+    Array(fish[1], fish[2], fish[3], fish[4], fish[5],
+          fish[6], fish[0] + fish[7], fish[8], fish[0])
+  vector_sum(iterate(spawn, fish, n))
+
+
+solve(fish, 256)
