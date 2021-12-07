@@ -3,6 +3,8 @@
 (require advent-of-code         
          threading)
 
+(provide (all-defined-out))
+
 (define test-input "3,4,3,1,2")
 
 (define (vector-update! vec i f)
@@ -33,11 +35,12 @@
 
 (define (total vec) (for/sum ([v vec]) v))
 
-(define (solve vec)
-  (for/fold ([v vec] #:result (total v)) ([i (in-range 80)])
+(define (solve vec [t 80])
+  (for/fold ([v vec] #:result (total v)) ([i (in-range t)])
     (step v)))
 
-(~> #;(open-input-string test-input)
-    (open-aoc-input (find-session) 2021 6 #:cache #t)
-    load-input
-    solve)
+(module* main #f
+  (~> #;(open-input-string test-input)
+      (open-aoc-input (find-session) 2021 6 #:cache #t)
+      load-input
+      solve))
