@@ -50,9 +50,6 @@
        (< x cols) (< y rows)))
 
 (define (xy->index c x y) (+ x (* y c)))
-(define (index->xy c i)
-  (define-values (y x) (quotient/remainder i c))
-  (values x y))
 
 (define (read-puzzle inp)
   (define raw (port->lines inp))
