@@ -4,6 +4,8 @@
          bitsyntax
          threading)
 
+(provide (all-defined-out))
+
 (define test-literal (bytes #xD2 #xFE #x28))
 (define test-operator1 (bytes #x38 #x00 #x6F #x45 #x29 #x12 #x00))
 (define test-operator2 (bytes #xEE #x00 #xD4 #x0C #x82 #x30 #x60))
@@ -90,12 +92,13 @@
   (define-values (pkt discard) (decode-packet input))
   pkt)
 
-(define (solve str)
+(define (decode str)
   (~> str
       string->bits
-      decode-packet-top
-      $packet-version-sum))
+      decode-packet-top))
 
-(~> (open-aoc-input (find-session) 2021 16 #:cache #t)
-    port->string
-    solve)
+(module* main #f
+  (~> (open-aoc-input (find-session) 2021 16 #:cache #t)
+      port->string
+      decode
+      $packet-version-sum))
